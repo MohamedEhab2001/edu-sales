@@ -8,6 +8,7 @@ A focused Next.js sales workspace for managing leads, scheduled calls, follow-up
 - Lead table with search, filters, pagination, CSV export, edit, archive, and phone-based duplicate protection.
 - Pipeline statuses: New, Contacted, Follow-up, Potential client, Call booked, Call finalized, and Lost.
 - Converted is an independent checkbox used only to mark that a lead has paid or subscribed; it is false by default and does not change automatically with pipeline status.
+- Client interest is tracked independently as Not rated, Cold, Warm, or Hot and can be updated from the lead, follow-up, or completed-call forms.
 - Scheduled calls with owner, date, contact, field, phone, social link, and preparation notes.
 - “Complete call” flow that creates a lead row or attaches the outcome to an existing lead with the same phone number.
 - Follow-up timeline with response, notes, salesperson, outcome, and next follow-up.

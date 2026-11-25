@@ -3,8 +3,9 @@
 import { FormEvent, useState } from "react";
 import { clientApi, localDateTimeToIso } from "@/lib/client-api";
 import { SmartInput } from "@/components/ui/smart-input";
-import { LEAD_STATUSES, type LeadStatus, type ScheduledCall } from "@/types/crm";
+import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES, type LeadStatus, type ScheduledCall } from "@/types/crm";
 import { statusLabel } from "@/components/ui/status-pill";
+import { interestLabel } from "@/components/ui/interest-pill";
 
 export function CompleteCallForm({
   call,
@@ -42,6 +43,7 @@ export function CompleteCallForm({
             bookedDate: call.scheduledAt,
             joined: form.get("joined") === "on",
             status,
+            interestLevel: form.get("interestLevel"),
             assignedSalesperson: form.get("assignedSalesperson"),
             finalNotes: form.get("finalNotes"),
             nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
@@ -50,6 +52,7 @@ export function CompleteCallForm({
             response: form.get("response"),
             notes: form.get("followUpNotes"),
             outcome: status,
+            interestLevel: form.get("interestLevel"),
             assignedSalesperson: form.get("assignedSalesperson"),
             nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
           },
@@ -84,6 +87,12 @@ export function CompleteCallForm({
         </label>
         <label className="field"><span>Response *</span><SmartInput id="complete-response" name="response" required options={responses} placeholder="What was their response?" /></label>
         <label className="field"><span>Next follow-up</span><input name="nextFollowUpAt" type="datetime-local" /></label>
+        <label className="field">
+          <span>Client interest</span>
+          <select name="interestLevel" defaultValue="unrated">
+            {CLIENT_INTEREST_LEVELS.map((level) => <option value={level} key={level}>{interestLabel(level)}</option>)}
+          </select>
+        </label>
       </div>
       <label className="field"><span>Follow-up notes</span><textarea name="followUpNotes" rows={3} defaultValue={call.notes} /></label>
       <label className="field"><span>Final lead notes</span><textarea name="finalNotes" rows={3} placeholder="Long-term context or qualification notes…" /></label>

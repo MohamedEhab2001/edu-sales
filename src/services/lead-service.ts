@@ -61,6 +61,7 @@ export async function addFollowUp(id: string, rawInput: unknown) {
       lastFollowUpAt: completedAt,
       nextFollowUpAt,
       ...(input.outcome ? { status: input.outcome } : {}),
+      ...(input.interestLevel ? { interestLevel: input.interestLevel } : {}),
     },
   };
 
@@ -83,6 +84,7 @@ export function buildLeadFilter(searchParams: URLSearchParams) {
   const status = searchParams.get("status");
   const field = searchParams.get("field");
   const salesperson = searchParams.get("salesperson");
+  const interestLevel = searchParams.get("interestLevel");
   const joined = searchParams.get("joined");
   const followUp = searchParams.get("followUp");
 
@@ -97,6 +99,8 @@ export function buildLeadFilter(searchParams: URLSearchParams) {
   if (status) filter.status = status;
   if (field) filter.field = field;
   if (salesperson) filter.assignedSalesperson = salesperson;
+  if (interestLevel === "unrated") filter.interestLevel = { $in: ["unrated", null] };
+  else if (interestLevel) filter.interestLevel = interestLevel;
   if (joined === "true" || joined === "false") filter.joined = joined === "true";
   if (followUp === "overdue") filter.nextFollowUpAt = { $lt: new Date() };
   if (followUp === "upcoming") filter.nextFollowUpAt = { $gte: new Date() };

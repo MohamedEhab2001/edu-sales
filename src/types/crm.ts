@@ -9,6 +9,8 @@ export const LEAD_STATUSES = [
 ] as const;
 
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
+export const CLIENT_INTEREST_LEVELS = ["unrated", "cold", "warm", "hot"] as const;
+export type ClientInterestLevel = (typeof CLIENT_INTEREST_LEVELS)[number];
 export type CallStatus = "scheduled" | "completed" | "cancelled";
 export type OptionType = "field" | "salesperson" | "response";
 
@@ -19,6 +21,7 @@ export interface FollowUp {
   response: string;
   notes?: string;
   outcome?: LeadStatus;
+  interestLevel?: ClientInterestLevel;
   assignedSalesperson?: string;
   nextFollowUpAt?: string;
   createdAt: string;
@@ -34,6 +37,7 @@ export interface Lead {
   bookedDate?: string;
   joined: boolean;
   status: LeadStatus;
+  interestLevel: ClientInterestLevel;
   assignedSalesperson: string;
   finalNotes?: string;
   lastFollowUpAt?: string;

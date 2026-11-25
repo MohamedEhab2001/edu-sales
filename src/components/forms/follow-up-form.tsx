@@ -3,8 +3,9 @@
 import { FormEvent, useState } from "react";
 import { clientApi, localDateTimeToIso } from "@/lib/client-api";
 import { SmartInput } from "@/components/ui/smart-input";
-import { LEAD_STATUSES, type Lead } from "@/types/crm";
+import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES, type Lead } from "@/types/crm";
 import { statusLabel } from "@/components/ui/status-pill";
+import { interestLabel } from "@/components/ui/interest-pill";
 
 export function FollowUpForm({
   lead,
@@ -33,6 +34,7 @@ export function FollowUpForm({
           response: form.get("response"),
           notes: form.get("notes"),
           outcome: form.get("outcome") || undefined,
+          interestLevel: form.get("interestLevel"),
           assignedSalesperson: form.get("assignedSalesperson"),
           nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
         }),
@@ -69,6 +71,12 @@ export function FollowUpForm({
         <label className="field">
           <span>Next follow-up</span>
           <input name="nextFollowUpAt" type="datetime-local" />
+        </label>
+        <label className="field">
+          <span>Client interest</span>
+          <select name="interestLevel" defaultValue={lead.interestLevel ?? "unrated"}>
+            {CLIENT_INTEREST_LEVELS.map((level) => <option value={level} key={level}>{interestLabel(level)}</option>)}
+          </select>
         </label>
       </div>
       <label className="field">

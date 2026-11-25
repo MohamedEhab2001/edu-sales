@@ -285,7 +285,7 @@ h1, h2, h3, p { margin-top: 0; }
 .salesperson-list > div > b { color: var(--brand-700); font-size: 17px; }
 
 /* Filters and tables */
-.filter-panel { margin-bottom: 16px; padding: 12px; display: grid; grid-template-columns: minmax(230px, 1.5fr) repeat(5, minmax(130px, .72fr)) auto; gap: 9px; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-xs); }
+.filter-panel { margin-bottom: 16px; padding: 12px; display: grid; grid-template-columns: minmax(230px, 1.5fr) repeat(6, minmax(130px, .72fr)) auto; gap: 9px; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-xs); }
 .filter-panel select { min-width: 0; }
 .search-field { padding: 0 12px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid var(--border); border-radius: 10px; }
 .search-field svg { width: 18px; color: var(--ink-400); }
@@ -323,6 +323,11 @@ td small { margin-top: 2px; display: block; color: var(--ink-500); font-size: 12
 .status-pill--call_booked { color: #6745ba; background: #f4efff; border-color: #dfd2fb; }
 .status-pill--joined { color: #0e8d58; background: #e8f8f1; border-color: #c7eddd; }
 .status-pill--lost { color: #a33c3c; background: #fef2f2; border-color: #f3d0d0; }
+.interest-pill { width: fit-content; padding: 5px 9px; display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.interest-pill--unrated { color: var(--ink-500); background: var(--ink-50); border-color: var(--ink-150); }
+.interest-pill--cold { color: #276d9c; background: #eaf5fc; border-color: #cde7f6; }
+.interest-pill--warm { color: #8c6414; background: #fff5e5; border-color: #f4dfb9; }
+.interest-pill--hot { color: #b52e4d; background: #fdeef3; border-color: #f7c8d5; }
 
 .empty-state { min-height: 220px; padding: 30px; display: grid; place-items: center; align-content: center; text-align: center; }
 .empty-state > span { width: 48px; height: 48px; margin-bottom: 14px; display: grid; place-items: center; color: var(--brand-600); background: var(--brand-50); border-radius: 14px; }

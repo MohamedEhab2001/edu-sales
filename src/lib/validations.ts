@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LEAD_STATUSES } from "@/types/crm";
+import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES } from "@/types/crm";
 
 const optionalText = z.string().trim().optional().or(z.literal(""));
 const optionalDate = z.string().datetime().optional().or(z.literal(""));
@@ -17,6 +17,7 @@ export const leadSchema = z.object({
   bookedDate: optionalDate,
   joined: z.boolean().default(false),
   status: z.enum(LEAD_STATUSES).default("new"),
+  interestLevel: z.enum(CLIENT_INTEREST_LEVELS).default("unrated"),
   assignedSalesperson: z.string().trim().min(2).max(80),
   finalNotes: optionalText,
   nextFollowUpAt: optionalDate,
@@ -30,6 +31,7 @@ export const followUpSchema = z.object({
   response: z.string().trim().min(1).max(120),
   notes: optionalText,
   outcome: z.enum(LEAD_STATUSES).optional(),
+  interestLevel: z.enum(CLIENT_INTEREST_LEVELS).optional(),
   assignedSalesperson: optionalText,
   nextFollowUpAt: optionalDate,
 });

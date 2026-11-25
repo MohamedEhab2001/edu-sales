@@ -4,12 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { clientApi } from "@/lib/client-api";
 import { formatDateTime, formatRelative, isOverdue } from "@/lib/format";
 import { useOptions } from "@/hooks/use-options";
-import type { Lead, LeadStatus } from "@/types/crm";
-import { LEAD_STATUSES } from "@/types/crm";
+import type { Lead } from "@/types/crm";
+import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES } from "@/types/crm";
 import { Icon } from "@/components/ui/icon";
 import { Modal } from "@/components/ui/modal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusPill, statusLabel } from "@/components/ui/status-pill";
+import { InterestPill, interestLabel } from "@/components/ui/interest-pill";
 import { LeadForm } from "@/components/forms/lead-form";
 import { FollowUpForm } from "@/components/forms/follow-up-form";
 
@@ -35,6 +36,7 @@ export function LeadsClient() {
   const [status, setStatus] = useState("");
   const [field, setField] = useState("");
   const [salesperson, setSalesperson] = useState("");
+  const [interestLevel, setInterestLevel] = useState("");
   const [joined, setJoined] = useState("");
   const [followUp, setFollowUp] = useState("");
 
@@ -43,6 +45,7 @@ export function LeadsClient() {
     if (query.get("new") === "1") setAddOpen(true);
     if (query.get("status")) setStatus(query.get("status") ?? "");
     if (query.get("joined")) setJoined(query.get("joined") ?? "");
+    if (query.get("interestLevel")) setInterestLevel(query.get("interestLevel") ?? "");
     if (query.get("followUp")) setFollowUp(query.get("followUp") ?? "");
     const leadId = query.get("lead");
     if (leadId) {
@@ -56,10 +59,11 @@ export function LeadsClient() {
     if (status) query.set("status", status);
     if (field) query.set("field", field);
     if (salesperson) query.set("salesperson", salesperson);
+    if (interestLevel) query.set("interestLevel", interestLevel);
     if (joined) query.set("joined", joined);
     if (followUp) query.set("followUp", followUp);
     return query.toString();
-  }, [field, followUp, joined, page, salesperson, search, status]);
+  }, [field, followUp, interestLevel, joined, page, salesperson, search, status]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -94,7 +98,7 @@ export function LeadsClient() {
     void load();
   }
 
-  const hasFilters = search || status || field || salesperson || joined || followUp;
+  const hasFilters = search || status || field || salesperson || interestLevel || joined || followUp;
 
   return (
     <div className="page-wrap">
@@ -124,6 +128,10 @@ export function LeadsClient() {
           <option value="">All salespeople</option>
           {options.salespeople.map((item) => <option value={item.value} key={item._id}>{item.value}</option>)}
         </select>
+        <select value={interestLevel} onChange={(event) => { setInterestLevel(event.target.value); setPage(1); }} aria-label="Filter by client interest">
+          <option value="">All interest levels</option>
+          {CLIENT_INTEREST_LEVELS.map((level) => <option value={level} key={level}>{interestLabel(level)}</option>)}
+        </select>
         <select value={followUp} onChange={(event) => { setFollowUp(event.target.value); setPage(1); }} aria-label="Filter by follow-up">
           <option value="">Any follow-up</option>
           <option value="overdue">Overdue</option>
@@ -135,7 +143,7 @@ export function LeadsClient() {
           <option value="true">Converted</option>
           <option value="false">Not converted</option>
         </select>
-        {hasFilters ? <button className="filter-clear" type="button" onClick={() => { setSearch(""); setStatus(""); setField(""); setSalesperson(""); setJoined(""); setFollowUp(""); setPage(1); }}>Clear</button> : null}
+        {hasFilters ? <button className="filter-clear" type="button" onClick={() => { setSearch(""); setStatus(""); setField(""); setSalesperson(""); setInterestLevel(""); setJoined(""); setFollowUp(""); setPage(1); }}>Clear</button> : null}
       </section>
 
       <section className="panel panel--table">
@@ -143,7 +151,7 @@ export function LeadsClient() {
         {loading ? <div className="loading-state">Loading leads…</div> : items.length ? (
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Lead</th><th>Field</th><th>Contact</th><th>Owner</th><th>Status</th><th>Next follow-up</th><th>Converted</th><th /></tr></thead>
+              <thead><tr><th>Lead</th><th>Field</th><th>Contact</th><th>Owner</th><th>Status</th><th>Interest</th><th>Next follow-up</th><th>Converted</th><th /></tr></thead>
               <tbody>
                 {items.map((lead) => (
                   <tr key={lead._id} className={isOverdue(lead.nextFollowUpAt) && !lead.joined ? "row--overdue" : ""}>
@@ -152,6 +160,7 @@ export function LeadsClient() {
                     <td><a href={`tel:${lead.phone}`} className="contact-link">{lead.phone}</a>{lead.socialMedia ? <a href={lead.socialMedia} target="_blank" rel="noreferrer"><small>Social profile</small></a> : null}</td>
                     <td>{lead.assignedSalesperson}</td>
                     <td><StatusPill status={lead.status} /></td>
+                    <td><InterestPill level={lead.interestLevel ?? "unrated"} /></td>
                     <td className={isOverdue(lead.nextFollowUpAt) && !lead.joined ? "text-danger" : ""}>{formatRelative(lead.nextFollowUpAt)}<small>{formatDateTime(lead.nextFollowUpAt)}</small></td>
                     <td>{lead.joined ? <span className="joined-mark"><Icon name="check" /> Yes</span> : <span className="muted">No</span>}</td>
                     <td><button className="table-action" type="button" onClick={() => setActiveLead(lead)}>Open</button></td>
@@ -176,7 +185,7 @@ export function LeadsClient() {
           <div className="lead-detail">
             <div className="lead-detail-top">
               <div className="lead-summary-card">
-                <div className="lead-summary-heading"><StatusPill status={activeLead.status} />{activeLead.joined ? <span className="joined-mark"><Icon name="check" /> Converted</span> : null}</div>
+                <div className="lead-summary-heading"><StatusPill status={activeLead.status} /><InterestPill level={activeLead.interestLevel ?? "unrated"} />{activeLead.joined ? <span className="joined-mark"><Icon name="check" /> Converted</span> : null}</div>
                 <dl>
                   <div><dt>Salesperson</dt><dd>{activeLead.assignedSalesperson}</dd></div>
                   <div><dt>Booked</dt><dd>{formatDateTime(activeLead.bookedDate)}</dd></div>
@@ -196,7 +205,7 @@ export function LeadsClient() {
                   {[...activeLead.followUps].reverse().map((item) => (
                     <article key={item._id}>
                       <span className="timeline-dot" />
-                      <div><header><strong>{item.response}</strong>{item.outcome ? <StatusPill status={item.outcome} /> : null}</header><p>{item.notes || "No additional notes."}</p><footer><span>{item.assignedSalesperson || activeLead.assignedSalesperson}</span><time>{formatDateTime(item.completedAt || item.createdAt)}</time>{item.nextFollowUpAt ? <span>Next: {formatDateTime(item.nextFollowUpAt)}</span> : null}</footer></div>
+                      <div><header><strong>{item.response}</strong>{item.outcome ? <StatusPill status={item.outcome} /> : null}{item.interestLevel ? <InterestPill level={item.interestLevel} /> : null}</header><p>{item.notes || "No additional notes."}</p><footer><span>{item.assignedSalesperson || activeLead.assignedSalesperson}</span><time>{formatDateTime(item.completedAt || item.createdAt)}</time>{item.nextFollowUpAt ? <span>Next: {formatDateTime(item.nextFollowUpAt)}</span> : null}</footer></div>
                     </article>
                   ))}
                 </div>

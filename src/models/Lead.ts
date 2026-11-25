@@ -1,5 +1,5 @@
 import { InferSchemaType, Schema, models, model, type Model } from "mongoose";
-import { LEAD_STATUSES } from "@/types/crm";
+import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES } from "@/types/crm";
 
 const followUpSchema = new Schema(
   {
@@ -8,6 +8,7 @@ const followUpSchema = new Schema(
     response: { type: String, required: true, trim: true },
     notes: { type: String, trim: true },
     outcome: { type: String, enum: LEAD_STATUSES },
+    interestLevel: { type: String, enum: CLIENT_INTEREST_LEVELS },
     assignedSalesperson: { type: String, trim: true },
     nextFollowUpAt: Date,
   },
@@ -24,6 +25,7 @@ const leadSchema = new Schema(
     bookedDate: Date,
     joined: { type: Boolean, default: false, index: true },
     status: { type: String, enum: LEAD_STATUSES, default: "new", index: true },
+    interestLevel: { type: String, enum: CLIENT_INTEREST_LEVELS, default: "unrated", index: true },
     assignedSalesperson: { type: String, required: true, trim: true, index: true },
     finalNotes: { type: String, trim: true },
     lastFollowUpAt: Date,
