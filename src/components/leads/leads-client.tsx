@@ -41,6 +41,8 @@ export function LeadsClient() {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (query.get("new") === "1") setAddOpen(true);
+    if (query.get("status")) setStatus(query.get("status") ?? "");
+    if (query.get("joined")) setJoined(query.get("joined") ?? "");
     if (query.get("followUp")) setFollowUp(query.get("followUp") ?? "");
     const leadId = query.get("lead");
     if (leadId) {
@@ -128,10 +130,10 @@ export function LeadsClient() {
           <option value="upcoming">Upcoming</option>
           <option value="none">Not scheduled</option>
         </select>
-        <select value={joined} onChange={(event) => { setJoined(event.target.value); setPage(1); }} aria-label="Filter by joined state">
-          <option value="">Joined or not</option>
-          <option value="true">Joined</option>
-          <option value="false">Not joined</option>
+        <select value={joined} onChange={(event) => { setJoined(event.target.value); setPage(1); }} aria-label="Filter by conversion state">
+          <option value="">Converted or not</option>
+          <option value="true">Converted</option>
+          <option value="false">Not converted</option>
         </select>
         {hasFilters ? <button className="filter-clear" type="button" onClick={() => { setSearch(""); setStatus(""); setField(""); setSalesperson(""); setJoined(""); setFollowUp(""); setPage(1); }}>Clear</button> : null}
       </section>
@@ -141,7 +143,7 @@ export function LeadsClient() {
         {loading ? <div className="loading-state">Loading leads…</div> : items.length ? (
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Lead</th><th>Field</th><th>Contact</th><th>Owner</th><th>Status</th><th>Next follow-up</th><th>Joined</th><th /></tr></thead>
+              <thead><tr><th>Lead</th><th>Field</th><th>Contact</th><th>Owner</th><th>Status</th><th>Next follow-up</th><th>Converted</th><th /></tr></thead>
               <tbody>
                 {items.map((lead) => (
                   <tr key={lead._id} className={isOverdue(lead.nextFollowUpAt) && !lead.joined ? "row--overdue" : ""}>
@@ -174,7 +176,7 @@ export function LeadsClient() {
           <div className="lead-detail">
             <div className="lead-detail-top">
               <div className="lead-summary-card">
-                <div className="lead-summary-heading"><StatusPill status={activeLead.status} />{activeLead.joined ? <span className="joined-mark"><Icon name="check" /> Joined</span> : null}</div>
+                <div className="lead-summary-heading"><StatusPill status={activeLead.status} />{activeLead.joined ? <span className="joined-mark"><Icon name="check" /> Converted</span> : null}</div>
                 <dl>
                   <div><dt>Salesperson</dt><dd>{activeLead.assignedSalesperson}</dd></div>
                   <div><dt>Booked</dt><dd>{formatDateTime(activeLead.bookedDate)}</dd></div>

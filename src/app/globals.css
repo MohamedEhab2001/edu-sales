@@ -223,13 +223,15 @@ h1, h2, h3, p { margin-top: 0; }
 .page-actions { display: flex; gap: 10px; flex: none; }
 
 /* Dashboard */
-.metric-grid { margin-bottom: 24px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.metric-card { min-height: 170px; padding: 20px; display: grid; grid-template-columns: 1fr auto; align-content: space-between; background: #fffffff2; border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-xs); }
+.metric-grid { margin-bottom: 24px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+.metric-card { min-height: 170px; padding: 20px; display: grid; grid-template-columns: 1fr auto; align-content: space-between; color: inherit; background: #fffffff2; border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-xs); transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+.metric-card:hover { transform: translateY(-2px); border-color: var(--brand-200); box-shadow: var(--shadow-sm); }
 .metric-card > span { color: var(--ink-600); font-size: 14px; font-weight: 700; }
 .metric-card > strong { grid-column: 1; font-size: 38px; line-height: 1; letter-spacing: -.04em; }
 .metric-card > small { grid-column: 1 / -1; color: var(--ink-500); font-size: 13px; }
 .metric-icon { width: 42px; height: 42px; grid-column: 2; grid-row: 1 / 3; display: grid; place-items: center; border-radius: 13px; }
 .metric-card--indigo .metric-icon { color: var(--brand-600); background: var(--brand-50); }
+.metric-card--amber .metric-icon { color: #9a6811; background: #fff5df; }
 .metric-card--green .metric-icon { color: #0e8d58; background: #e8f8f1; }
 .metric-card--blue .metric-icon { color: #2177ae; background: #eaf5fc; }
 .metric-card--rose .metric-icon { color: #c43f62; background: #fdeef3; }
@@ -299,6 +301,7 @@ td small { margin-top: 2px; display: block; color: var(--ink-500); font-size: 12
 .status-pill--new { color: var(--brand-700); background: var(--brand-50); border-color: var(--brand-100); }
 .status-pill--contacted { color: #276d9c; background: #eaf5fc; border-color: #cde7f6; }
 .status-pill--follow_up { color: #8c6414; background: #fff5e5; border-color: #f4dfb9; }
+.status-pill--potential { color: #8a5b0a; background: #fff4d6; border-color: #f1d99c; }
 .status-pill--call_booked { color: #6745ba; background: #f4efff; border-color: #dfd2fb; }
 .status-pill--joined { color: #0e8d58; background: #e8f8f1; border-color: #c7eddd; }
 .status-pill--lost { color: #a33c3c; background: #fef2f2; border-color: #f3d0d0; }

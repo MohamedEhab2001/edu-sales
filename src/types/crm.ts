@@ -2,6 +2,7 @@ export const LEAD_STATUSES = [
   "new",
   "contacted",
   "follow_up",
+  "potential",
   "call_booked",
   "joined",
   "lost",
@@ -69,6 +70,7 @@ export interface SavedOption {
 
 export interface Analytics {
   totalLeads: number;
+  potentialLeads: number;
   joinedLeads: number;
   conversionRate: number;
   overdueFollowUps: number;

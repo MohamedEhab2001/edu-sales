@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 
 const emptyAnalytics: Analytics = {
   totalLeads: 0,
+  potentialLeads: 0,
   joinedLeads: 0,
   conversionRate: 0,
   overdueFollowUps: 0,
@@ -47,11 +48,12 @@ export function DashboardClient() {
     void load();
   }, [load]);
 
-  const metrics: Array<{ label: string; value: string | number; detail: string; icon: IconName; tone: string }> = [
-    { label: "Active leads", value: analytics.totalLeads, detail: "Across all pipeline stages", icon: "people", tone: "indigo" },
-    { label: "Joined", value: analytics.joinedLeads, detail: `${analytics.conversionRate}% conversion`, icon: "check", tone: "green" },
-    { label: "Calls today", value: analytics.callsToday, detail: `${analytics.upcomingCalls} upcoming`, icon: "phone", tone: "blue" },
-    { label: "Overdue follow-ups", value: analytics.overdueFollowUps, detail: "Need attention now", icon: "clock", tone: "rose" },
+  const metrics: Array<{ label: string; value: string | number; detail: string; icon: IconName; tone: string; href: string }> = [
+    { label: "Active leads", value: analytics.totalLeads, detail: "Across all pipeline stages", icon: "people", tone: "indigo", href: "/leads" },
+    { label: "Potential clients", value: analytics.potentialLeads, detail: "Qualified opportunities", icon: "trend", tone: "amber", href: "/leads?status=potential" },
+    { label: "Converted", value: analytics.joinedLeads, detail: `${analytics.conversionRate}% conversion`, icon: "check", tone: "green", href: "/leads?joined=true" },
+    { label: "Calls today", value: analytics.callsToday, detail: `${analytics.upcomingCalls} upcoming`, icon: "phone", tone: "blue", href: "/calls" },
+    { label: "Overdue follow-ups", value: analytics.overdueFollowUps, detail: "Need attention now", icon: "clock", tone: "rose", href: "/leads?followUp=overdue" },
   ];
   const maxField = Math.max(1, ...analytics.fieldBreakdown.map((item) => item.count));
 
@@ -71,12 +73,12 @@ export function DashboardClient() {
 
       <section className="metric-grid" aria-label="Sales metrics">
         {metrics.map((metric) => (
-          <article className={`metric-card metric-card--${metric.tone}`} key={metric.label}>
+          <Link className={`metric-card metric-card--${metric.tone}`} href={metric.href} key={metric.label}>
             <div className="metric-icon"><Icon name={metric.icon} /></div>
             <span>{metric.label}</span>
             <strong>{loading ? "—" : metric.value}</strong>
             <small>{metric.detail}</small>
-          </article>
+          </Link>
         ))}
       </section>
 
@@ -142,14 +144,14 @@ export function DashboardClient() {
         </article>
 
         <article className="panel">
-          <header className="panel-header"><div><h2>Salesperson performance</h2><p>Lead load and joined outcomes.</p></div></header>
+          <header className="panel-header"><div><h2>Salesperson performance</h2><p>Lead load and converted outcomes.</p></div></header>
           {analytics.salespersonBreakdown.length ? (
             <div className="salesperson-list">
               {analytics.salespersonBreakdown.map((person) => (
                 <div key={person.label}>
                   <span className="avatar avatar--soft">{person.label.split(" ").map((word) => word[0]).slice(0, 2).join("")}</span>
                   <div><strong>{person.label}</strong><small>{person.count} leads assigned</small></div>
-                  <b>{person.joined}<small> joined</small></b>
+                  <b>{person.joined}<small> converted</small></b>
                 </div>
               ))}
             </div>

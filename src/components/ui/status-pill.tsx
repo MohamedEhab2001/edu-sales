@@ -4,8 +4,9 @@ const labels: Record<LeadStatus, string> = {
   new: "New",
   contacted: "Contacted",
   follow_up: "Follow-up",
+  potential: "Potential client",
   call_booked: "Call booked",
-  joined: "Joined",
+  joined: "Converted",
   lost: "Lost",
 };
 

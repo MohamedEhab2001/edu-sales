@@ -6,11 +6,11 @@ A focused Next.js sales workspace for managing leads, scheduled calls, follow-up
 
 - One pre-seeded administrator account with a secure HTTP-only session cookie.
 - Lead table with search, filters, pagination, CSV export, edit, archive, and phone-based duplicate protection.
-- Pipeline statuses: New, Contacted, Follow-up, Call booked, Joined, and Lost.
+- Pipeline statuses: New, Contacted, Follow-up, Potential client, Call booked, Converted, and Lost.
 - Scheduled calls with owner, date, contact, field, phone, social link, and preparation notes.
 - “Complete call” flow that creates a lead row or attaches the outcome to an existing lead with the same phone number.
 - Follow-up timeline with response, notes, salesperson, outcome, and next follow-up.
-- Dashboard metrics for total leads, joined leads, conversion rate, today’s calls, upcoming calls, overdue follow-ups, fields, and salesperson performance.
+- Dashboard metrics for total leads, potential clients, converted leads, conversion rate, today’s calls, upcoming calls, overdue follow-ups, fields, and salesperson performance.
 - Dynamic field, salesperson, and response values. New typed values are remembered automatically and become suggestions in later forms.
 - Saved-values screen for adding or removing future suggestions without changing historical records.
 - Cairo-time reporting and responsive desktop/mobile layouts.

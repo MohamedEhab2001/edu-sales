@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       "Phone",
       "Social media",
       "Booked date",
-      "Joined",
+      "Converted",
       "Status",
       "Salesperson",
       "Last follow-up",

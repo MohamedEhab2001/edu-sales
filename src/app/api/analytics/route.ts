@@ -18,6 +18,7 @@ export async function GET() {
 
     const [
       totalLeads,
+      potentialLeads,
       joinedLeads,
       overdueFollowUps,
       callsToday,
@@ -27,6 +28,7 @@ export async function GET() {
       salespersonBreakdown,
     ] = await Promise.all([
       LeadModel.countDocuments(active),
+      LeadModel.countDocuments({ ...active, status: "potential" }),
       LeadModel.countDocuments({ ...active, joined: true }),
       LeadModel.countDocuments({ ...active, nextFollowUpAt: { $lt: now }, joined: false }),
       ScheduledCallModel.countDocuments({
@@ -60,6 +62,7 @@ export async function GET() {
 
     return NextResponse.json({
       totalLeads,
+      potentialLeads,
       joinedLeads,
       conversionRate: totalLeads ? Math.round((joinedLeads / totalLeads) * 1000) / 10 : 0,
       overdueFollowUps,
