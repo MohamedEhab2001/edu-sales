@@ -22,9 +22,10 @@ export function FollowUpForm({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setLoading(true);
     setError("");
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     try {
       const data = await clientApi<{ lead: Lead }>(`/api/leads/${lead._id}/follow-ups`, {
         method: "POST",
@@ -36,7 +37,7 @@ export function FollowUpForm({
           nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
         }),
       });
-      event.currentTarget.reset();
+      formElement.reset();
       onSaved(data.lead);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not save follow-up.");

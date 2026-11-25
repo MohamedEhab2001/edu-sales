@@ -20,14 +20,15 @@ export function SettingsClient() {
 
   async function add(event: FormEvent<HTMLFormElement>, type: OptionType) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const value = String(form.get("value") ?? "").trim();
     if (!value) return;
     setSaving(type);
     setError("");
     try {
       await clientApi("/api/options", { method: "POST", body: JSON.stringify({ type, value }) });
-      event.currentTarget.reset();
+      formElement.reset();
       await options.refresh();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not save value.");
