@@ -22,6 +22,23 @@ const emptyAnalytics: Analytics = {
   salespersonBreakdown: [],
 };
 
+function PanelLoadingState({ rows = 4, chart = false }: { rows?: number; chart?: boolean }) {
+  return (
+    <div className={`dashboard-skeleton${chart ? " dashboard-skeleton--chart" : ""}`} aria-hidden="true">
+      {Array.from({ length: rows }, (_, index) => (
+        <div className="dashboard-skeleton-row" key={index}>
+          {chart ? null : <span className="skeleton dashboard-skeleton-avatar" />}
+          <div>
+            <span className="skeleton dashboard-skeleton-title" />
+            <span className="skeleton dashboard-skeleton-copy" />
+          </div>
+          <span className="skeleton dashboard-skeleton-tail" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function DashboardClient() {
   const [analytics, setAnalytics] = useState(emptyAnalytics);
   const [calls, setCalls] = useState<ScheduledCall[]>([]);
@@ -71,13 +88,13 @@ export function DashboardClient() {
         </div>
       </header>
 
-      <section className="metric-grid" aria-label="Sales metrics">
+      <section className="metric-grid" aria-label="Sales metrics" aria-busy={loading}>
         {metrics.map((metric) => (
           <Link className={`metric-card metric-card--${metric.tone}`} href={metric.href} key={metric.label}>
             <div className="metric-icon"><Icon name={metric.icon} /></div>
             <span>{metric.label}</span>
-            <strong>{loading ? "—" : metric.value}</strong>
-            <small>{metric.detail}</small>
+            <strong>{loading ? <span className="skeleton metric-skeleton-value" aria-hidden="true" /> : metric.value}</strong>
+            <small>{loading ? <span className="skeleton metric-skeleton-detail" aria-hidden="true" /> : metric.detail}</small>
           </Link>
         ))}
       </section>
@@ -87,7 +104,7 @@ export function DashboardClient() {
           <header className="panel-header">
             <div><h2>Leads by field</h2><p>Your strongest segments at a glance.</p></div>
           </header>
-          {analytics.fieldBreakdown.length ? (
+          {loading ? <PanelLoadingState rows={4} chart /> : analytics.fieldBreakdown.length ? (
             <div className="bar-list">
               {analytics.fieldBreakdown.map((item) => (
                 <div className="bar-row" key={item.label}>
@@ -104,7 +121,7 @@ export function DashboardClient() {
             <div><h2>Upcoming calls</h2><p>The next conversations on the calendar.</p></div>
             <Link href="/calls">View all</Link>
           </header>
-          {calls.length ? (
+          {loading ? <PanelLoadingState rows={4} /> : calls.length ? (
             <div className="compact-list">
               {calls.map((call) => (
                 <Link className="compact-item" href="/calls" key={call._id}>
@@ -124,7 +141,7 @@ export function DashboardClient() {
             <div><h2>Overdue follow-ups</h2><p>Leads waiting for the next touch.</p></div>
             <Link href="/leads?followUp=overdue">Open queue</Link>
           </header>
-          {followUps.length ? (
+          {loading ? <PanelLoadingState rows={4} /> : followUps.length ? (
             <div className="table-wrap table-wrap--compact">
               <table>
                 <thead><tr><th>Lead</th><th>Status</th><th>Owner</th><th>Due</th></tr></thead>
@@ -145,7 +162,7 @@ export function DashboardClient() {
 
         <article className="panel">
           <header className="panel-header"><div><h2>Salesperson performance</h2><p>Lead load and converted outcomes.</p></div></header>
-          {analytics.salespersonBreakdown.length ? (
+          {loading ? <PanelLoadingState rows={4} /> : analytics.salespersonBreakdown.length ? (
             <div className="salesperson-list">
               {analytics.salespersonBreakdown.map((person) => (
                 <div key={person.label}>
