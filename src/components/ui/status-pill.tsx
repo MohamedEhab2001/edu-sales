@@ -6,7 +6,7 @@ const labels: Record<LeadStatus, string> = {
   follow_up: "Follow-up",
   potential: "Potential client",
   call_booked: "Call booked",
-  joined: "Converted",
+  joined: "Call finalized",
   lost: "Lost",
 };
 

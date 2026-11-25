@@ -16,7 +16,7 @@ export async function createLead(rawInput: unknown) {
     phoneNormalized,
     bookedDate: optionalDate(input.bookedDate),
     nextFollowUpAt: optionalDate(input.nextFollowUpAt),
-    joined: input.joined || input.status === "joined",
+    joined: input.joined,
   });
 
   await rememberLeadOptions(input);
@@ -31,7 +31,6 @@ export async function updateLead(id: string, rawInput: unknown) {
   if (input.phone) update.phoneNormalized = normalizePhone(input.phone);
   if ("bookedDate" in input) update.bookedDate = optionalDate(input.bookedDate);
   if ("nextFollowUpAt" in input) update.nextFollowUpAt = optionalDate(input.nextFollowUpAt);
-  if (input.status) update.joined = input.status === "joined";
 
   const lead = await LeadModel.findByIdAndUpdate(id, update, {
     new: true,
@@ -62,7 +61,6 @@ export async function addFollowUp(id: string, rawInput: unknown) {
       lastFollowUpAt: completedAt,
       nextFollowUpAt,
       ...(input.outcome ? { status: input.outcome } : {}),
-      ...(input.outcome ? { joined: input.outcome === "joined" } : {}),
     },
   };
 

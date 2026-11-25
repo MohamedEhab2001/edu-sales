@@ -40,7 +40,7 @@ export function CompleteCallForm({
             phone: form.get("phone"),
             socialMedia: form.get("socialMedia"),
             bookedDate: call.scheduledAt,
-            joined: status === "joined",
+            joined: form.get("joined") === "on",
             status,
             assignedSalesperson: form.get("assignedSalesperson"),
             finalNotes: form.get("finalNotes"),
@@ -87,6 +87,10 @@ export function CompleteCallForm({
       </div>
       <label className="field"><span>Follow-up notes</span><textarea name="followUpNotes" rows={3} defaultValue={call.notes} /></label>
       <label className="field"><span>Final lead notes</span><textarea name="finalNotes" rows={3} placeholder="Long-term context or qualification notes…" /></label>
+      <label className="check-field">
+        <input name="joined" type="checkbox" defaultChecked={false} />
+        <span>Converted — this lead has paid or subscribed</span>
+      </label>
       <div className="form-actions">
         <button className="button button--secondary" type="button" onClick={onCancel}>Cancel</button>
         <button className="button button--primary" type="submit" disabled={loading}>{loading ? "Completing…" : "Complete call and create lead"}</button>

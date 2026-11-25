@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       lead.socialMedia,
       lead.bookedDate?.toISOString(),
       lead.joined ? "Yes" : "No",
-      lead.status,
+      lead.status === "joined" ? "Call finalized" : lead.status,
       lead.assignedSalesperson,
       lead.lastFollowUpAt?.toISOString(),
       lead.nextFollowUpAt?.toISOString(),

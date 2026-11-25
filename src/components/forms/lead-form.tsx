@@ -35,7 +35,7 @@ export function LeadForm({
       socialMedia: form.get("socialMedia"),
       bookedDate: localDateTimeToIso(String(form.get("bookedDate") ?? "")),
       status,
-      joined: status === "joined",
+      joined: form.get("joined") === "on",
       assignedSalesperson: form.get("assignedSalesperson"),
       finalNotes: form.get("finalNotes"),
       nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
@@ -97,6 +97,10 @@ export function LeadForm({
       <label className="field">
         <span>Final notes</span>
         <textarea name="finalNotes" rows={4} defaultValue={initial?.finalNotes} placeholder="Context, objections and anything the team should know…" />
+      </label>
+      <label className="check-field">
+        <input name="joined" type="checkbox" defaultChecked={initial?.joined ?? false} />
+        <span>Converted — this lead has paid or subscribed</span>
       </label>
       <div className="form-actions">
         <button className="button button--secondary" type="button" onClick={onCancel}>Cancel</button>
