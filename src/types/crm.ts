@@ -82,5 +82,6 @@ export interface Analytics {
   upcomingCalls: number;
   statusBreakdown: Array<{ label: LeadStatus; count: number }>;
   fieldBreakdown: Array<{ label: string; count: number }>;
+  potentialFieldBreakdown: Array<{ label: string; count: number }>;
   salespersonBreakdown: Array<{ label: string; count: number; joined: number }>;
 }

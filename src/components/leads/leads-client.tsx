@@ -44,6 +44,7 @@ export function LeadsClient() {
     const query = new URLSearchParams(window.location.search);
     if (query.get("new") === "1") setAddOpen(true);
     if (query.get("status")) setStatus(query.get("status") ?? "");
+    if (query.get("field")) setField(query.get("field") ?? "");
     if (query.get("joined")) setJoined(query.get("joined") ?? "");
     if (query.get("interestLevel")) setInterestLevel(query.get("interestLevel") ?? "");
     if (query.get("followUp")) setFollowUp(query.get("followUp") ?? "");
@@ -122,6 +123,7 @@ export function LeadsClient() {
         </select>
         <select value={field} onChange={(event) => { setField(event.target.value); setPage(1); }} aria-label="Filter by field">
           <option value="">All fields</option>
+          {field && !options.fields.some((item) => item.value === field) ? <option value={field}>{field}</option> : null}
           {options.fields.map((item) => <option value={item.value} key={item._id}>{item.value}</option>)}
         </select>
         <select value={salesperson} onChange={(event) => { setSalesperson(event.target.value); setPage(1); }} aria-label="Filter by salesperson">

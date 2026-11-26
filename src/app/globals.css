@@ -254,6 +254,7 @@ h1, h2, h3, p { margin-top: 0; }
 @keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -120% 0; } }
 @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 .dashboard-grid { margin-bottom: 24px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr); gap: 24px; }
+.dashboard-grid--overview { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .dashboard-grid--bottom { grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr); }
 .panel { min-width: 0; background: #fffffff2; border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-xs); }
 .panel:not(.panel--table) { padding: 22px; }
@@ -262,10 +263,15 @@ h1, h2, h3, p { margin-top: 0; }
 .panel-header p { margin: 0; color: var(--ink-500); font-size: 14px; }
 .panel-header > a { color: var(--brand-600); font-size: 14px; font-weight: 700; }
 .bar-list { display: grid; gap: 18px; }
+.bar-row { display: block; min-width: 0; border-radius: 4px; }
+.bar-row:hover > div:first-child > span { text-decoration: underline; }
 .bar-row > div:first-child { margin-bottom: 7px; display: flex; justify-content: space-between; gap: 16px; font-size: 14px; }
+.bar-row > div:first-child > span { overflow-wrap: anywhere; }
 .bar-row strong { color: var(--brand-700); }
 .bar-track { height: 9px; background: var(--ink-100); border-radius: 999px; overflow: hidden; }
 .bar-track i { height: 100%; display: block; background: linear-gradient(90deg, var(--brand-500), var(--brand-300)); border-radius: inherit; }
+.panel--potential-fields .bar-row strong { color: #9a6811; }
+.panel--potential-fields .bar-track i { background: linear-gradient(90deg, #d49326, #f2c777); }
 .compact-list { display: grid; }
 .compact-item { padding: 13px 0; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid var(--ink-150); }
 .compact-item:last-child { border-bottom: 0; }
@@ -419,6 +425,11 @@ td small { margin-top: 2px; display: block; color: var(--ink-500); font-size: 12
 .option-list strong { font-size: 14px; }
 .option-list small { color: var(--ink-500); font-size: 12px; }
 .option-list button { color: var(--danger); background: transparent; border: 0; font-size: 13px; font-weight: 700; }
+
+@media (min-width: 901px) and (max-width: 1360px) {
+  .dashboard-grid--overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-grid--overview > :last-child { grid-column: 1 / -1; }
+}
 
 @media (max-width: 1180px) {
   :root { --sidebar-width: 236px; }

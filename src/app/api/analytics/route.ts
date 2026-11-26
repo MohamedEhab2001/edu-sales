@@ -18,7 +18,7 @@ export async function GET() {
 
     const [
       totalLeads,
-      potentialLeads,
+      potentialFieldGroups,
       joinedLeads,
       overdueFollowUps,
       callsToday,
@@ -28,7 +28,11 @@ export async function GET() {
       salespersonBreakdown,
     ] = await Promise.all([
       LeadModel.countDocuments(active),
-      LeadModel.countDocuments({ ...active, status: "potential" }),
+      LeadModel.aggregate<{ _id: string; count: number }>([
+        { $match: { ...active, status: "potential" } },
+        { $group: { _id: "$field", count: { $sum: 1 } } },
+        { $sort: { count: -1, _id: 1 } },
+      ]),
       LeadModel.countDocuments({ ...active, joined: true }),
       LeadModel.countDocuments({ ...active, nextFollowUpAt: { $lt: now }, joined: false }),
       ScheduledCallModel.countDocuments({
@@ -62,7 +66,7 @@ export async function GET() {
 
     return NextResponse.json({
       totalLeads,
-      potentialLeads,
+      potentialLeads: potentialFieldGroups.reduce((total, item) => total + item.count, 0),
       joinedLeads,
       conversionRate: totalLeads ? Math.round((joinedLeads / totalLeads) * 1000) / 10 : 0,
       overdueFollowUps,
@@ -70,6 +74,7 @@ export async function GET() {
       upcomingCalls,
       statusBreakdown: statusBreakdown.map((item) => ({ label: item._id, count: item.count })),
       fieldBreakdown: fieldBreakdown.map((item) => ({ label: item._id, count: item.count })),
+      potentialFieldBreakdown: potentialFieldGroups.map((item) => ({ label: item._id, count: item.count })),
       salespersonBreakdown: salespersonBreakdown.map((item) => ({
         label: item._id,
         count: item.count,

@@ -19,6 +19,7 @@ const emptyAnalytics: Analytics = {
   upcomingCalls: 0,
   statusBreakdown: [],
   fieldBreakdown: [],
+  potentialFieldBreakdown: [],
   salespersonBreakdown: [],
 };
 
@@ -34,6 +35,33 @@ function PanelLoadingState({ rows = 4, chart = false }: { rows?: number; chart?:
           </div>
           <span className="skeleton dashboard-skeleton-tail" />
         </div>
+      ))}
+    </div>
+  );
+}
+
+function FieldBars({
+  fields,
+  status,
+}: {
+  fields: Analytics["fieldBreakdown"];
+  status?: "potential";
+}) {
+  const maxCount = Math.max(1, ...fields.map(({ count }) => count));
+
+  return (
+    <div className="bar-list">
+      {fields.map(({ label, count }) => (
+        <Link
+          className="bar-row"
+          href={{ pathname: "/leads", query: { field: label, ...(status && { status }) } }}
+          key={label}
+        >
+          <div><span dir="auto">{label}</span><strong>{count}</strong></div>
+          <div className="bar-track" aria-hidden="true">
+            <i style={{ width: `${Math.max(8, (count / maxCount) * 100)}%` }} />
+          </div>
+        </Link>
       ))}
     </div>
   );
@@ -72,8 +100,6 @@ export function DashboardClient() {
     { label: "Calls today", value: analytics.callsToday, detail: `${analytics.upcomingCalls} upcoming`, icon: "phone", tone: "blue", href: "/calls" },
     { label: "Overdue follow-ups", value: analytics.overdueFollowUps, detail: "Need attention now", icon: "clock", tone: "rose", href: "/leads?followUp=overdue" },
   ];
-  const maxField = Math.max(1, ...analytics.fieldBreakdown.map((item) => item.count));
-
   return (
     <div className="page-wrap">
       <header className="page-header">
@@ -99,21 +125,26 @@ export function DashboardClient() {
         ))}
       </section>
 
-      <section className="dashboard-grid">
+      <section className="dashboard-grid dashboard-grid--overview">
         <article className="panel panel--chart">
           <header className="panel-header">
             <div><h2>Leads by field</h2><p>Your strongest segments at a glance.</p></div>
           </header>
           {loading ? <PanelLoadingState rows={4} chart /> : analytics.fieldBreakdown.length ? (
-            <div className="bar-list">
-              {analytics.fieldBreakdown.map((item) => (
-                <div className="bar-row" key={item.label}>
-                  <div><span>{item.label}</span><strong>{item.count}</strong></div>
-                  <div className="bar-track"><i style={{ width: `${Math.max(8, (item.count / maxField) * 100)}%` }} /></div>
-                </div>
-              ))}
-            </div>
+            <FieldBars fields={analytics.fieldBreakdown} />
           ) : <EmptyState icon="trend" title="No field data yet" description="Field analytics will appear after the first leads are added." />}
+        </article>
+
+        <article className="panel panel--chart panel--potential-fields" aria-busy={loading}>
+          <header className="panel-header">
+            <div>
+              <h2>Potential clients by field</h2>
+              <p>Select a field to see its potential clients.</p>
+            </div>
+          </header>
+          {loading ? <PanelLoadingState chart /> : analytics.potentialFieldBreakdown.length ? (
+            <FieldBars fields={analytics.potentialFieldBreakdown} status="potential" />
+          ) : <EmptyState icon="trend" title="No potential clients yet" description="Leads appear here when moved to Potential client." />}
         </article>
 
         <article className="panel">
