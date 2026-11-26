@@ -7,6 +7,24 @@ import { CLIENT_INTEREST_LEVELS, LEAD_STATUSES, type Lead } from "@/types/crm";
 import { statusLabel } from "@/components/ui/status-pill";
 import { interestLabel } from "@/components/ui/interest-pill";
 
+type LeadFieldValues = Pick<Lead, "name" | "phone" | "field" | "assignedSalesperson" | "socialMedia" | "bookedDate" | "status" | "nextFollowUpAt" | "interestLevel" | "finalNotes" | "joined">;
+
+export function readLeadFields(form: FormData) {
+  return {
+    name: form.get("name"),
+    field: form.get("field"),
+    phone: form.get("phone"),
+    socialMedia: form.get("socialMedia"),
+    bookedDate: localDateTimeToIso(String(form.get("bookedDate") ?? "")),
+    status: form.get("status"),
+    interestLevel: form.get("interestLevel"),
+    joined: form.get("joined") === "on",
+    assignedSalesperson: form.get("assignedSalesperson"),
+    finalNotes: form.get("finalNotes"),
+    nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
+  };
+}
+
 export function LeadForm({
   initial,
   fields,
@@ -27,23 +45,9 @@ export function LeadForm({
     event.preventDefault();
     setLoading(true);
     setError("");
-    const form = new FormData(event.currentTarget);
-    const status = String(form.get("status"));
-    const body = {
-      name: form.get("name"),
-      field: form.get("field"),
-      phone: form.get("phone"),
-      socialMedia: form.get("socialMedia"),
-      bookedDate: localDateTimeToIso(String(form.get("bookedDate") ?? "")),
-      status,
-      interestLevel: form.get("interestLevel"),
-      joined: form.get("joined") === "on",
-      assignedSalesperson: form.get("assignedSalesperson"),
-      finalNotes: form.get("finalNotes"),
-      nextFollowUpAt: localDateTimeToIso(String(form.get("nextFollowUpAt") ?? "")),
-    };
 
     try {
+      const body = readLeadFields(new FormData(event.currentTarget));
       const data = await clientApi<{ lead: Lead }>(initial ? `/api/leads/${initial._id}` : "/api/leads", {
         method: initial ? "PATCH" : "POST",
         body: JSON.stringify(body),
@@ -59,6 +63,26 @@ export function LeadForm({
   return (
     <form className="form-stack" onSubmit={submit}>
       {error ? <div className="alert alert--error">{error}</div> : null}
+      <LeadFields initial={initial} fields={fields} salespeople={salespeople} />
+      <div className="form-actions">
+        <button className="button button--secondary" type="button" onClick={onCancel}>Cancel</button>
+        <button className="button button--primary" type="submit" disabled={loading}>{loading ? "Saving…" : initial ? "Save changes" : "Add lead"}</button>
+      </div>
+    </form>
+  );
+}
+
+export function LeadFields({
+  initial,
+  fields,
+  salespeople,
+}: {
+  initial?: Partial<LeadFieldValues>;
+  fields: string[];
+  salespeople: string[];
+}) {
+  return (
+    <>
       <div className="form-grid form-grid--2">
         <label className="field">
           <span>Name *</span>
@@ -110,10 +134,6 @@ export function LeadForm({
         <input name="joined" type="checkbox" defaultChecked={initial?.joined ?? false} />
         <span>Converted — this lead has paid or subscribed</span>
       </label>
-      <div className="form-actions">
-        <button className="button button--secondary" type="button" onClick={onCancel}>Cancel</button>
-        <button className="button button--primary" type="submit" disabled={loading}>{loading ? "Saving…" : initial ? "Save changes" : "Add lead"}</button>
-      </div>
-    </form>
+    </>
   );
 }

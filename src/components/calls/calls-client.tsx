@@ -132,8 +132,28 @@ export function CallsClient() {
         />
       </Modal>
 
-      <Modal open={Boolean(activeCall)} title="Complete scheduled call" description={activeCall ? `Create or update the lead for ${activeCall.contactName}.` : undefined} onClose={() => setActiveCall(null)} wide>
-        {activeCall ? <CompleteCallForm call={activeCall} fields={options.fields.map((item) => item.value)} salespeople={options.salespeople.map((item) => item.value)} responses={options.responses.map((item) => item.value)} onCancel={() => setActiveCall(null)} onCompleted={(leadId) => router.push(`/leads?lead=${leadId}`)} /> : null}
+      <Modal
+        open={Boolean(activeCall)}
+        title="Add lead from call"
+        description="Review the details from the scheduled call and fill in anything that’s missing."
+        onClose={() => setActiveCall(null)}
+        wide
+      >
+        {activeCall ? (
+          <CompleteCallForm
+            key={activeCall._id}
+            call={activeCall}
+            fields={options.fields.map((item) => item.value)}
+            salespeople={options.salespeople.map((item) => item.value)}
+            responses={options.responses.map((item) => item.value)}
+            onCancel={() => setActiveCall(null)}
+            onCompleted={(leadId) => {
+              setItems((current) => current.filter((call) => call._id !== activeCall._id));
+              setActiveCall((current) => current?._id === activeCall._id ? null : current);
+              router.push(`/leads?lead=${leadId}`);
+            }}
+          />
+        ) : null}
       </Modal>
     </div>
   );

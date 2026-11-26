@@ -1,4 +1,4 @@
-import type { FilterQuery, UpdateQuery } from "mongoose";
+import type { ClientSession, FilterQuery, UpdateQuery } from "mongoose";
 import { connectToDatabase } from "@/lib/db";
 import { optionalDate } from "@/lib/date";
 import { normalizePhone } from "@/lib/normalization";
@@ -6,43 +6,53 @@ import { rememberLeadOptions, rememberOption } from "@/lib/options";
 import { LeadModel, type LeadDocument } from "@/models/Lead";
 import { leadSchema, leadUpdateSchema, followUpSchema } from "@/lib/validations";
 
-export async function createLead(rawInput: unknown) {
+export async function createLead(rawInput: unknown, session?: ClientSession) {
   const input = leadSchema.parse(rawInput);
   await connectToDatabase();
   const phoneNormalized = normalizePhone(input.phone);
 
-  const lead = await LeadModel.create({
+  const lead = new LeadModel({
     ...input,
     phoneNormalized,
     bookedDate: optionalDate(input.bookedDate),
     nextFollowUpAt: optionalDate(input.nextFollowUpAt),
     joined: input.joined,
   });
+  await lead.save({ session });
 
-  await rememberLeadOptions(input);
+  if (!session) await rememberLeadOptions(input);
   return lead.toObject();
 }
 
-export async function updateLead(id: string, rawInput: unknown) {
+export async function updateLead(id: string, rawInput: unknown, session?: ClientSession) {
   const input = leadUpdateSchema.parse(rawInput);
   await connectToDatabase();
 
   const update: UpdateQuery<LeadDocument> = { ...input };
   if (input.phone) update.phoneNormalized = normalizePhone(input.phone);
-  if ("bookedDate" in input) update.bookedDate = optionalDate(input.bookedDate);
-  if ("nextFollowUpAt" in input) update.nextFollowUpAt = optionalDate(input.nextFollowUpAt);
+  for (const field of ["bookedDate", "nextFollowUpAt"] as const) {
+    if (!(field in input)) continue;
+    const date = optionalDate(input[field]);
+    if (date) {
+      update[field] = date;
+    } else {
+      delete update[field];
+      update.$unset = { ...update.$unset, [field]: 1 };
+    }
+  }
 
   const lead = await LeadModel.findByIdAndUpdate(id, update, {
     new: true,
     runValidators: true,
+    session,
   }).lean();
 
   if (!lead) throw new Error("Lead not found.");
-  await rememberLeadOptions(input);
+  if (!session) await rememberLeadOptions(input);
   return lead;
 }
 
-export async function addFollowUp(id: string, rawInput: unknown) {
+export async function addFollowUp(id: string, rawInput: unknown, session?: ClientSession) {
   const input = followUpSchema.parse(rawInput);
   await connectToDatabase();
 
@@ -68,13 +78,16 @@ export async function addFollowUp(id: string, rawInput: unknown) {
   const lead = await LeadModel.findByIdAndUpdate(id, update, {
     new: true,
     runValidators: true,
+    session,
   }).lean();
 
   if (!lead) throw new Error("Lead not found.");
-  await Promise.all([
-    rememberOption("response", input.response),
-    rememberOption("salesperson", input.assignedSalesperson),
-  ]);
+  if (!session) {
+    await Promise.all([
+      rememberOption("response", input.response),
+      rememberOption("salesperson", input.assignedSalesperson),
+    ]);
+  }
   return lead;
 }
 
