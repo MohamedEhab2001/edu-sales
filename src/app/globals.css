@@ -405,7 +405,7 @@ td small { margin-top: 2px; display: block; color: var(--ink-500); font-size: 12
 .call-card footer > div:first-child { display: grid; }
 .call-card footer span { color: var(--ink-500); font-size: 12px; }
 .call-card footer strong { font-size: 14px; }
-.call-actions { display: flex; gap: 8px; }
+.call-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .call-summary-strip { padding: 12px 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: var(--brand-50); border: 1px solid var(--brand-100); border-radius: 12px; }
 .call-summary-strip div { display: grid; }
 .call-summary-strip span { color: var(--brand-700); font-size: 12px; }
@@ -479,8 +479,7 @@ td small { margin-top: 2px; display: block; color: var(--ink-500); font-size: 12
   .call-date-tile { min-height: 100%; }
   .call-date-tile > strong { font-size: 34px; }
   .call-card footer { align-items: stretch; flex-direction: column; }
-  .call-actions, .call-actions .button { width: 100%; }
-  .call-actions .button { flex: 1; }
+  .call-actions .button { flex: 1 0 auto; }
   .call-toolbar { align-items: stretch; flex-direction: column; }
   .tab-list { width: 100%; }
   .tab-list button { flex: 1; }

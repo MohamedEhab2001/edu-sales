@@ -26,7 +26,7 @@ export function CallsClient() {
   const [salesperson, setSalesperson] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [callForm, setCallForm] = useState<{ initial?: ScheduledCall } | null>(null);
   const [activeCall, setActiveCall] = useState<ScheduledCall | null>(null);
 
   const load = useCallback(async () => {
@@ -50,11 +50,15 @@ export function CallsClient() {
 
   async function cancelCall(call: ScheduledCall) {
     if (!window.confirm(`Cancel the call with ${call.contactName}?`)) return;
-    await clientApi(`/api/calls/${call._id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status: "cancelled" }),
-    });
-    void load();
+    try {
+      await clientApi(`/api/calls/${call._id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      void load();
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Could not cancel the call.");
+    }
   }
 
   return (
@@ -65,7 +69,7 @@ export function CallsClient() {
           <h1>Turn each booked call into a clear outcome.</h1>
           <p>Prepare the conversation, complete it, then continue in the lead follow-up timeline.</p>
         </div>
-        <button className="button button--primary" type="button" onClick={() => setScheduleOpen(true)}><Icon name="plus" /> Schedule call</button>
+        <button className="button button--primary" type="button" onClick={() => setCallForm({})}><Icon name="plus" /> Schedule call</button>
       </header>
 
       <section className="call-toolbar">
@@ -91,7 +95,13 @@ export function CallsClient() {
                   <div className="call-meta"><span><Icon name="phone" /> {call.phone}</span><span><Icon name="people" /> {call.field}</span><span><Icon name="calendar" /> {formatRelative(call.scheduledAt)}</span></div>
                   {call.notes ? <p className="call-notes">{call.notes}</p> : null}
                   <footer><div><span>Assigned to</span><strong>{call.assignedSalesperson}</strong></div><div className="call-actions">
-                    {call.status === "scheduled" ? <><button className="button button--secondary" type="button" onClick={() => cancelCall(call)}>Cancel</button><button className="button button--primary" type="button" onClick={() => setActiveCall(call)}>Complete call</button></> : null}
+                    {call.status === "scheduled" ? (
+                      <>
+                        <button className="button button--secondary" type="button" onClick={() => setCallForm({ initial: call })}>Edit</button>
+                        <button className="button button--secondary" type="button" onClick={() => cancelCall(call)}>Cancel</button>
+                        <button className="button button--primary" type="button" onClick={() => setActiveCall(call)}>Complete call</button>
+                      </>
+                    ) : null}
                     {call.status === "completed" && call.leadId ? <button className="button button--secondary" type="button" onClick={() => router.push(`/leads?lead=${call.leadId}`)}>Open lead</button> : null}
                   </div></footer>
                 </div>
@@ -101,8 +111,25 @@ export function CallsClient() {
         </section>
       ) : <div className="panel"><EmptyState icon="calendar" title={`No ${status} calls`} description={status === "scheduled" ? "Schedule the next sales call to start the queue." : `Calls marked ${status} will appear here.`} /></div>}
 
-      <Modal open={scheduleOpen} title="Schedule a call" description="The call becomes a lead only after you complete it." onClose={() => setScheduleOpen(false)} wide>
-        <CallForm fields={options.fields.map((item) => item.value)} salespeople={options.salespeople.map((item) => item.value)} onCancel={() => setScheduleOpen(false)} onSaved={() => { setScheduleOpen(false); void load(); void options.refresh(); }} />
+      <Modal
+        open={callForm !== null}
+        title={callForm?.initial ? "Edit scheduled call" : "Schedule a call"}
+        description={callForm?.initial?.contactName ?? "The call becomes a lead only after you complete it."}
+        onClose={() => setCallForm(null)}
+        wide
+      >
+        <CallForm
+          key={callForm?.initial?._id ?? "new"}
+          initial={callForm?.initial}
+          fields={options.fields.map((item) => item.value)}
+          salespeople={options.salespeople.map((item) => item.value)}
+          onCancel={() => setCallForm(null)}
+          onSaved={() => {
+            setCallForm((current) => current === callForm ? null : current);
+            void load();
+            void options.refresh();
+          }}
+        />
       </Modal>
 
       <Modal open={Boolean(activeCall)} title="Complete scheduled call" description={activeCall ? `Create or update the lead for ${activeCall.contactName}.` : undefined} onClose={() => setActiveCall(null)} wide>
